@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Will You Go Out With Me?</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Floating background hearts */
+    .heart-bg {
+      position: absolute;
+      color: rgba(255, 255, 255, 0.15);
+      font-size: 2rem;
+      animation: floatUp 8s infinite linear;
+      user-select: none;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(0.8); opacity: 0; }
+      50% { opacity: 0.8; }
+      100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+    }
+
+    .card {
+      background: #ffffff;
+      padding: 35px 25px;
+      border-radius: 24px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 380px;
+      max-width: 90%;
+      position: relative;
+      z-index: 10;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    h2 {
+      color: #1e3c72;
+      margin-bottom: 15px;
+      font-size: 1.4rem;
+    }
+
+    p {
+      color: #555;
+      font-size: 0.95rem;
+    }
+
+    .avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 20px;
+      object-fit: cover;
+      margin-bottom: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 25px;
+      position: relative;
+      min-height: 48px;
+    }
+
+    button {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 25px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+
+    .btn-blue {
+      background: linear-gradient(135deg, #2a5298, #1e3c72);
+      color: white;
+      box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+    }
+
+    .btn-blue:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(30, 60, 114, 0.4);
+    }
+
+    .btn-no {
+      background-color: #e2e8f0;
+      color: #4a5568;
+      position: absolute;
+      width: auto;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #2a5298;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      outline: none;
+      font-size: 0.95rem;
+      color: #333;
+    }
+
+    input:focus, select:focus {
+      border-color: #2a5298;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .option-card {
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 15px 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #f8fafc;
+    }
+
+    .option-card:hover {
+      border-color: #2a5298;
+      background: #eff6ff;
+      transform: translateY(-2px);
+    }
+
+    .itinerary-box {
+      background: linear-gradient(135deg, #2a5298, #1e3c72);
+      color: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: left;
+      box-shadow: 0 8px 20px rgba(30, 60, 114, 0.25);
+    }
+
+    .itinerary-title {
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0.8;
+      margin-bottom: 12px;
+    }
+
+    .itinerary-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+    }
+
+    .status-msg {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: #16a34a;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Animated Hearts -->
+  <div class="heart-bg" style="left: 10%; animation-delay: 0s;">💙</div>
+  <div class="heart-bg" style="left: 25%; animation-delay: 2s;">✨</div>
+  <div class="heart-bg" style="left: 50%; animation-delay: 4s;">💙</div>
+  <div class="heart-bg" style="left: 75%; animation-delay: 1s;">✨</div>
+  <div class="heart-bg" style="left: 90%; animation-delay: 5s;">💙</div>
+
+  <div class="card">
+    
+    <!-- Screen 1: Proposal -->
+    <div id="screen1" class="screen active">
+      <img class="avatar" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=300" alt="Cute Dog" />
+      <h2>🌸 Will you go on a date with me? 🌸</h2>
+      <div class="btn-group">
+        <button class="btn-blue" onclick="nextScreen('screen2')">YES ♥</button>
+        <button class="btn-no" id="noBtn" onmouseover="dodgeBtn()">NO</button>
+      </div>
+    </div>
+
+    <!-- Screen 2: Acceptance -->
+    <div id="screen2" class="screen">
+      <h2>WAIT YOU ACTUALLY SAID YES?? 😲</h2>
+      <p style="margin-bottom: 20px;">I was so ready for you to say no</p>
+      <button class="btn-blue" onclick="nextScreen('screen3')">okay okay! →</button>
+    </div>
+
+    <!-- Screen 3: Time & Date Picker -->
+    <div id="screen3" class="screen">
+      <h2>📅 So... when are you free?</h2>
+      <div class="form-group" style="margin-top: 15px;">
+        <label>Pick a Day 🗓️</label>
+        <input type="date" id="dateInput" />
+      </div>
+      <div class="form-group">
+        <label>What Time? ⏰</label>
+        <select id="timeInput">
+          <option>12:00 PM</option>
+          <option>01:30 PM</option>
+          <option>04:00 PM</option>
+          <option>06:00 PM</option>
+          <option>07:30 PM</option>
+        </select>
+      </div>
+      <button class="btn-blue" onclick="saveDateTime()">set the date! ♥</button>
+    </div>
+
+    <!-- Screen 4: Food Choice -->
+    <div id="screen4" class="screen">
+      <h2>What are we feeling? 🍕✨</h2>
+      <p style="font-size: 0.85rem; color: #777; margin-bottom: 10px;">Pick your vibe</p>
+      <div class="grid">
+        <div class="option-card" onclick="selectFood('Pizza')"><span style="font-size:1.8rem; display:block;">🍕</span>Pizza</div>
+        <div class="option-card" onclick="selectFood('Sushi')"><span style="font-size:1.8rem; display:block;">🍣</span>Sushi</div>
+        <div class="option-card" onclick="selectFood('Burgers')"><span style="font-size:1.8rem; display:block;">🍔</span>Burgers</div>
+        <div class="option-card" onclick="selectFood('Ramen')"><span style="font-size:1.8rem; display:block;">🍜</span>Ramen</div>
+      </div>
+    </div>
+
+    <!-- Screen 5: Location Choice (Sunyani) -->
+    <div id="screen5" class="screen">
+      <h2>Where should we meet? 📍✨</h2>
+      <p style="font-size: 0.85rem; color: #777; margin-bottom: 10px;">Choose a spot in Sunyani</p>
+      <div class="grid">
+        <div class="option-card" onclick="selectLocation('Eusbette Hotel')"><span style="font-size:1.8rem; display:block;">🏨</span>Eusbette Hotel</div>
+        <div class="option-card" onclick="selectLocation('Tesil Hotel')"><span style="font-size:1.8rem; display:block;">🏨</span>Tesil Hotel</div>
+        <div class="option-card" onclick="selectLocation('District Cafe')"><span style="font-size:1.8rem; display:block;">☕</span>District Cafe</div>
+        <div class="option-card" onclick="selectLocation('Pizzaman')"><span style="font-size:1.8rem; display:block;">🍕</span>Pizzaman</div>
+      </div>
+    </div>
+
+    <!-- Screen 6: Note -->
+    <div id="screen6" class="screen">
+      <h2>glad you didn't say no. be ready! 🚗</h2>
+      <p style="font-size: 0.85rem; color: #666; margin: 20px 0;">
+        P.S. Made a website for you during lunch, no big deal.
+      </p>
+      <button class="btn-blue" onclick="showItinerary()">ok I accept 🥰</button>
+    </div>
+
+    <!-- Screen 7: Final Summary & Instant Email Send -->
+    <div id="screen7" class="screen">
+      <span style="font-size: 2.5rem;">🎉</span>
+      <h2>IT'S A DATE! 🎉 💙</h2>
+      <p>See you in Sunyani! I'll come get you. 🚗</p>
+
+      <div class="itinerary-box">
+        <div class="itinerary-title">OUR DATE ITINERARY</div>
+        <div class="itinerary-item">🗓️ <span id="summaryDate">Sep 25, 2026 @ 06:00 PM</span></div>
+        <div class="itinerary-item">🍽️ Food: <span id="summaryFood">Pizza</span></div>
+        <div class="itinerary-item">📍 Location: <span id="summaryLocation">Eusbette Hotel, Sunyani</span></div>
+      </div>
+
+      <button class="btn-blue" id="sendBtn" onclick="sendSelectionsToEmail()">Can't wait! 💙 ✨</button>
+      <div class="status-msg" id="statusMsg">Sent! Check your email inbox 📬</div>
+    </div>
+
+  </div>
+
+  <script>
+    let choices = { date: '', time: '', food: '', location: '' };
+
+    // Your Full Web3Forms Key
+    const WEB3FORMS_ACCESS_KEY = "5b4ad7b0-1c45-470d-b987-99a8c0b1a231";
+
+    function nextScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    function dodgeBtn() {
+      const btn = document.getElementById('noBtn');
+      const x = Math.floor(Math.random() * 160) - 80;
+      const y = Math.floor(Math.random() * 160) - 80;
+      btn.style.transform = `translate(${x}px, ${y}px)`;
+    }
+
+    function saveDateTime() {
+      const dateVal = document.getElementById('dateInput').value;
+      const timeVal = document.getElementById('timeInput').value;
+      if (!dateVal) {
+        alert("Please pick a date first! 😉");
+        return;
+      }
+      choices.date = dateVal;
+      choices.time = timeVal;
+      nextScreen('screen4');
+    }
+
+    function selectFood(foodName) {
+      choices.food = foodName;
+      nextScreen('screen5');
+    }
+
+    function selectLocation(locName) {
+      choices.location = locName;
+      nextScreen('screen6');
+    }
+
+    function showItinerary() {
+      document.getElementById('summaryDate').innerText = `${choices.date} @ ${choices.time}`;
+      document.getElementById('summaryFood').innerText = choices.food;
+      document.getElementById('summaryLocation').innerText = `${choices.location}, Sunyani`;
+      nextScreen('screen7');
+    }
+
+    function sendSelectionsToEmail() {
+      const sendBtn = document.getElementById('sendBtn');
+      const statusMsg = document.getElementById('statusMsg');
+
+      sendBtn.innerText = "Sending... 💌";
+      sendBtn.disabled = true;
+
+      fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: "She accepted your Date Proposal! 💕",
+          from_name: "Date Proposal Site",
+          message: `Date: ${choices.date}\nTime: ${choices.time}\nFood: ${choices.food}\nLocation: ${choices.location}, Sunyani`
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          sendBtn.innerText = "Sent! See you soon 🥰";
+          statusMsg.style.display = "block";
+        } else {
+          alert("Error sending email. Please check your internet connection.");
+          sendBtn.innerText = "Can't wait! 💙 ✨";
+          sendBtn.disabled = false;
+        }
+      })
+      .catch(error => {
+        alert("Network error. Please try again.");
+        sendBtn.innerText = "Can't wait! 💙 ✨";
+        sendBtn.disabled = false;
+      });
+    }
+  </script>
+
+</body>
+</html>
